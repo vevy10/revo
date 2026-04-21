@@ -69,7 +69,8 @@ async function submit() {
                     Complétez votre profil et définissez un mot de passe fort pour activer le compte créé par l’administrateur.
                 </p>
                 <div class="mt-8 rounded-lg border border-blue-100 bg-white p-5 text-sm text-slate-600">
-                    Le mot de passe doit contenir au moins 10 caractères, des majuscules, des minuscules et des chiffres.
+                    Le lien est valable 48 heures et ne peut être utilisé qu’une seule fois. Le mot de passe doit contenir au moins
+                    10 caractères, des majuscules, des minuscules et des chiffres.
                 </div>
             </div>
 

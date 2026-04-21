@@ -33,7 +33,8 @@ class UserInvitationNotification extends Notification
             ->subject('Activation de votre compte Revo')
             ->greeting('Bienvenue')
             ->line('Un administrateur vous a invité à activer votre compte de gestion de station-service.')
-            ->line('Cette invitation expire le '.$this->invitation->expires_at->translatedFormat('d/m/Y à H:i').'.')
+            ->line('Ce lien est valable 48 heures et ne peut être utilisé qu’une seule fois.')
+            ->line('Expiration : '.$this->invitation->expires_at->translatedFormat('d/m/Y à H:i').'.')
             ->action('Activer mon compte', $activationUrl)
             ->line('Si vous n’attendiez pas cette invitation, vous pouvez ignorer cet email.');
     }

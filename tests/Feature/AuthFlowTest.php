@@ -55,6 +55,10 @@ test('admin creates a pending user and sends an invitation', function () {
         ->and($user->password)->toBeNull()
         ->and($user->role->code)->toBe(UserRole::Cashier->value);
 
+    $invitation = Invitation::query()->where('email', 'cashier@example.test')->firstOrFail();
+
+    expect($invitation->expires_at->equalTo($invitation->created_at->addHours(48)))->toBeTrue();
+
     Notification::assertSentTo($user, UserInvitationNotification::class);
 });
 
@@ -89,6 +93,40 @@ test('invited user activates account and receives an api token', function () {
     expect($user->activated_at)->not->toBeNull()
         ->and($user->email_verified_at)->not->toBeNull()
         ->and($user->invitations()->first()->accepted_at)->not->toBeNull();
+});
+
+test('invitation token can only be used once', function () {
+    $role = Role::query()->where('code', UserRole::Cashier->value)->firstOrFail();
+    $user = User::query()->create([
+        'email' => 'single-use@example.test',
+        'role_id' => $role->id,
+    ]);
+    $plainToken = 'single-use-invitation-token';
+
+    Invitation::query()->create([
+        'user_id' => $user->id,
+        'role_id' => $role->id,
+        'email' => $user->email,
+        'token' => hash('sha256', $plainToken),
+        'expires_at' => now()->addHours(48),
+    ]);
+
+    $payload = [
+        'first_name' => 'Marie',
+        'last_name' => 'Curie',
+        'password' => 'Password1234',
+        'password_confirmation' => 'Password1234',
+    ];
+
+    $this->postJson("/api/invitations/{$plainToken}/activate", $payload)->assertOk();
+
+    $this->postJson("/api/invitations/{$plainToken}/activate", $payload)
+        ->assertConflict()
+        ->assertJsonPath('message', 'Cette invitation a déjà été utilisée.');
+
+    $this->getJson("/api/invitations/{$plainToken}")
+        ->assertConflict()
+        ->assertJsonPath('message', 'Cette invitation a déjà été utilisée.');
 });
 
 test('expired invitation cannot activate an account', function () {

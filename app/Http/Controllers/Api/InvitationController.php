@@ -39,7 +39,7 @@ class InvitationController extends Controller
                 'role_id' => $role->id,
                 'email' => $user->email,
                 'token' => hash('sha256', $plainToken),
-                'expires_at' => now()->addDays(7),
+                'expires_at' => now()->addHours(48),
             ]);
         });
 
@@ -53,7 +53,7 @@ class InvitationController extends Controller
 
     public function show(string $token): JsonResponse
     {
-        $invitation = $this->findByToken($token);
+        $invitation = $this->findByToken($token, lockForUpdate: true);
 
         if (! $invitation) {
             return response()->json(['message' => 'Lien d’invitation invalide.'], Response::HTTP_NOT_FOUND);
@@ -84,21 +84,21 @@ class InvitationController extends Controller
             'password' => ['required', 'confirmed', Password::min(10)->mixedCase()->numbers()],
         ]);
 
-        $invitation = $this->findByToken($token);
+        $result = DB::transaction(function () use ($data, $token): array {
+            $invitation = $this->findByToken($token, lockForUpdate: true);
 
-        if (! $invitation) {
-            return response()->json(['message' => 'Lien d’invitation invalide.'], Response::HTTP_NOT_FOUND);
-        }
+            if (! $invitation) {
+                return ['status' => Response::HTTP_NOT_FOUND, 'message' => 'Lien d’invitation invalide.'];
+            }
 
-        if ($invitation->isAccepted()) {
-            return response()->json(['message' => 'Cette invitation a déjà été utilisée.'], Response::HTTP_CONFLICT);
-        }
+            if ($invitation->isAccepted()) {
+                return ['status' => Response::HTTP_CONFLICT, 'message' => 'Cette invitation a déjà été utilisée.'];
+            }
 
-        if ($invitation->isExpired()) {
-            return response()->json(['message' => 'Cette invitation a expiré.'], Response::HTTP_GONE);
-        }
+            if ($invitation->isExpired()) {
+                return ['status' => Response::HTTP_GONE, 'message' => 'Cette invitation a expiré.'];
+            }
 
-        DB::transaction(function () use ($data, $invitation): void {
             $invitation->user->forceFill([
                 'first_name' => $data['first_name'],
                 'last_name' => $data['last_name'],
@@ -110,9 +110,15 @@ class InvitationController extends Controller
             $invitation->forceFill([
                 'accepted_at' => now(),
             ])->save();
+
+            return ['status' => Response::HTTP_OK, 'user' => $invitation->user->fresh('role')];
         });
 
-        $user = $invitation->user->fresh('role');
+        if ($result['status'] !== Response::HTTP_OK) {
+            return response()->json(['message' => $result['message']], $result['status']);
+        }
+
+        $user = $result['user'];
 
         return response()->json([
             'message' => 'Compte activé.',
@@ -121,11 +127,16 @@ class InvitationController extends Controller
         ]);
     }
 
-    private function findByToken(string $token): ?Invitation
+    private function findByToken(string $token, bool $lockForUpdate = false): ?Invitation
     {
-        return Invitation::query()
+        $query = Invitation::query()
             ->with(['role', 'user'])
-            ->where('token', hash('sha256', $token))
-            ->first();
+            ->where('token', hash('sha256', $token));
+
+        if ($lockForUpdate) {
+            $query->lockForUpdate();
+        }
+
+        return $query->first();
     }
 }
