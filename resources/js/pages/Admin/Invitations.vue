@@ -79,9 +79,12 @@ async function submit() {
     <main class="min-h-screen bg-slate-50 px-6 py-8 text-slate-950">
         <section class="mx-auto max-w-5xl">
             <div class="flex items-center justify-between gap-4 border-b border-slate-200 pb-6">
-                <div>
+                <div class="flex items-center gap-4">
+                    <img alt="Revo" class="h-12 w-auto object-contain" height="56" src="/logo.png" width="103" />
+                    <div>
                     <p class="text-sm font-semibold uppercase tracking-[0.22em] text-blue-700">Administration</p>
                     <h1 class="mt-2 text-3xl font-semibold">Inviter un utilisateur</h1>
+                    </div>
                 </div>
                 <a class="cursor-pointer rounded-md border border-slate-300 bg-white px-4 py-2 text-sm hover:border-blue-600" href="/dashboard">
                     Tableau de bord
@@ -90,6 +93,7 @@ async function submit() {
 
             <div class="mt-8 grid gap-6 lg:grid-cols-[1fr_360px]">
                 <form class="rounded-lg border border-slate-200 bg-white p-6" @submit.prevent="submit">
+                    <img alt="Revo" class="h-10 w-auto object-contain" height="48" src="/logo.png" width="88" />
                     <p class="text-sm font-semibold uppercase tracking-[0.18em] text-blue-700">Nouvelle invitation</p>
                     <h2 class="mt-2 text-2xl font-semibold">Créer un accès contrôlé</h2>
 

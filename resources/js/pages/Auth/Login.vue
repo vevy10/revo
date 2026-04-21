@@ -44,6 +44,7 @@ async function submit() {
     <main class="min-h-screen bg-slate-50 px-6 py-8 text-slate-950">
         <section class="mx-auto grid min-h-[calc(100vh-4rem)] max-w-6xl items-center gap-10 md:grid-cols-[1fr_430px]">
             <div class="max-w-2xl">
+                <img alt="Revo" class="h-14 w-auto object-contain" height="64" src="/logo.png" width="117" />
                 <p class="text-sm font-semibold uppercase tracking-[0.22em] text-blue-700">Gestion de station-service</p>
                 <h1 class="mt-5 text-4xl font-semibold tracking-normal text-slate-950 md:text-6xl">
                     Revo, accès sécurisé
@@ -68,6 +69,7 @@ async function submit() {
             </div>
 
             <form class="rounded-lg border border-slate-200 bg-white p-6" @submit.prevent="submit">
+                <img alt="Revo" class="h-10 w-auto object-contain" height="48" src="/logo.png" width="88" />
                 <p class="text-sm font-semibold uppercase tracking-[0.18em] text-blue-700">Connexion</p>
                 <h2 class="mt-2 text-2xl font-semibold text-slate-950">Accéder au tableau de bord</h2>
 

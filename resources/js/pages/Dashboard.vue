@@ -34,9 +34,12 @@ onMounted(async () => {
     <main class="min-h-screen bg-slate-50 px-6 py-8 text-slate-950">
         <section class="mx-auto max-w-6xl">
             <div class="flex items-center justify-between gap-4 border-b border-slate-200 pb-6">
-                <div>
-                    <p class="text-sm font-semibold uppercase tracking-[0.22em] text-blue-700">Tableau de bord</p>
-                    <h1 class="mt-2 text-3xl font-semibold">Espace station</h1>
+                <div class="flex items-center gap-4">
+                    <img alt="Revo" class="h-12 w-auto object-contain" height="56" src="/logo.png" width="103" />
+                    <div>
+                        <p class="text-sm font-semibold uppercase tracking-[0.22em] text-blue-700">Tableau de bord</p>
+                        <h1 class="mt-2 text-3xl font-semibold">Espace station</h1>
+                    </div>
                 </div>
                 <button class="cursor-pointer rounded-md border border-slate-300 bg-white px-4 py-2 text-sm hover:border-blue-600" @click="auth.logout">
                     Se déconnecter
